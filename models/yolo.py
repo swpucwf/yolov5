@@ -49,7 +49,9 @@ from models.common import (
     GhostConv,
     Proto,
     PW_Conv,
-    BottleneckMOB
+    BottleneckMOB,
+      conv_bn_relu_maxpool,
+            Shuffle_Block
 )
 from models.experimental import MixConv2d
 from utils.autoanchor import check_anchor_order
@@ -418,7 +420,9 @@ def parse_model(d, ch):
             DWConvTranspose2d,
             C3x,
             PW_Conv,
-            BottleneckMOB
+            BottleneckMOB,
+            conv_bn_relu_maxpool,
+            Shuffle_Block
         }:
             c1, c2 = ch[f], args[0]
             if c2 != no:  # if not output
