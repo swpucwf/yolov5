@@ -1,0 +1,1 @@
+python train.py   --cfg models/yolov5-shufflenetv2.yaml  --batch-size 8 --device cpu  --epochs 5
