@@ -49,9 +49,11 @@ from models.common import (
     GhostConv,
     Proto,
     PW_Conv,
-    BottleneckMOB,
-      conv_bn_relu_maxpool,
-            Shuffle_Block
+    # BottleneckMOB,
+    MobileNetv3,
+    conv_bn_relu_maxpool,
+    Shuffle_Block,
+    Conv3BN
 )
 from models.experimental import MixConv2d
 from utils.autoanchor import check_anchor_order
@@ -420,7 +422,9 @@ def parse_model(d, ch):
             DWConvTranspose2d,
             C3x,
             PW_Conv,
-            BottleneckMOB,
+            # BottleneckMOB,
+            Conv3BN,
+            MobileNetv3,
             conv_bn_relu_maxpool,
             Shuffle_Block
         }:
