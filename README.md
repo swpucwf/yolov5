@@ -469,4 +469,15 @@ For YOLOv5 bug reports and feature requests please visit [GitHub Issues](https:/
   <a href="https://ultralytics.com/discord"><img src="https://github.com/ultralytics/assets/raw/main/social/logo-social-discord.png" width="3%" alt="Ultralytics Discord"></a>
 </div>
 
+
+
+
+
+
+
+
+### 更新 
+1. 20240722更新模型 shufflenetv2
+2. 
+
 [tta]: https://docs.ultralytics.com/yolov5/tutorials/test_time_augmentation
