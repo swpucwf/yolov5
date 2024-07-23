@@ -74,15 +74,16 @@ class Conv(nn.Module):
     # Standard convolution with args(ch_in, ch_out, kernel, stride, padding, groups, dilation, activation)
     default_act = nn.SiLU()  # default activation
 
-    def __init__(self, c1, c2, k=1, s=1, p=None, g=1, d=1, act=True):
+    def __init__(self, c1, c2, k=1, s=1, p= None, g=1, d=1, act=True):
         """Initializes a standard convolution layer with optional batch normalization and activation."""
         super().__init__()
-        self.conv = nn.Conv2d(c1, c2, k, s, autopad(k, p, d), groups=g, dilation=d, bias=False)
+        self.conv = nn.Conv2d(c1, c2, (k,k), (s,s), autopad(k, p, d), groups=g, dilation=d, bias=False)
         self.bn = nn.BatchNorm2d(c2)
         self.act = self.default_act if act is True else act if isinstance(act, nn.Module) else nn.Identity()
 
     def forward(self, x):
         """Applies a convolution followed by batch normalization and an activation function to the input tensor `x`."""
+        # print(self.conv)
         return self.act(self.bn(self.conv(x)))
 
     def forward_fuse(self, x):
@@ -1084,43 +1085,43 @@ class Classify(nn.Module):
 
 
 
-#mobilenet  Bottleneck  InvertedResidual  
-class BottleneckMOB(nn.Module):  
-    #c1:inp  c2:oup s:stride  expand_ratio:t  
-    def __init__(self, c1, c2, s, expand_ratio):  
-        super(BottleneckMOB, self).__init__()  
-        self.s = s  
-        hidden_dim = round(c1 * expand_ratio)  
-        self.use_res_connect = self.s == 1 and c1 == c2  
-        if expand_ratio == 1:  
-            self.conv = nn.Sequential(  
-                # dw  
-                nn.Conv2d(hidden_dim, hidden_dim, 3, s, 1, groups=hidden_dim, bias=False),  
-                nn.BatchNorm2d(hidden_dim),  
-                nn.ReLU6(inplace=True),  
-                # pw-linear  
-                nn.Conv2d(hidden_dim, c2, 1, 1, 0, bias=False),  
-                nn.BatchNorm2d(c2),  
-            )  
-        else:  
-            self.conv = nn.Sequential(  
-                # pw  
-                nn.Conv2d(c1, hidden_dim, 1, 1, 0, bias=False),  
-                nn.BatchNorm2d(hidden_dim),  
-                nn.ReLU6(inplace=True),  
-                # dw  
-                nn.Conv2d(hidden_dim, hidden_dim, 3, s, 1, groups=hidden_dim, bias=False),  
-                nn.BatchNorm2d(hidden_dim),  
-                nn.ReLU6(inplace=True),  
-                # pw-linear  
-                nn.Conv2d(hidden_dim, c2, 1, 1, 0, bias=False),  
-                nn.BatchNorm2d(c2),  
-            )  
-    def forward(self, x):  
-        if self.use_res_connect:  
-            return x + self.conv(x)  
-        else:  
-            return self.conv(x)  
+# #mobilenet  Bottleneck  InvertedResidual  
+# class BottleneckMOB(nn.Module):  
+#     #c1:inp  c2:oup s:stride  expand_ratio:t  
+#     def __init__(self, c1, c2, s, expand_ratio):  
+#         super(BottleneckMOB, self).__init__()  
+#         self.s = s  
+#         hidden_dim = round(c1 * expand_ratio)  
+#         self.use_res_connect = self.s == 1 and c1 == c2  
+#         if expand_ratio == 1:  
+#             self.conv = nn.Sequential(  
+#                 # dw  
+#                 nn.Conv2d(hidden_dim, hidden_dim, 3, s, 1, groups=hidden_dim, bias=False),  
+#                 nn.BatchNorm2d(hidden_dim),  
+#                 nn.ReLU6(inplace=True),  
+#                 # pw-linear  
+#                 nn.Conv2d(hidden_dim, c2, 1, 1, 0, bias=False),  
+#                 nn.BatchNorm2d(c2),  
+#             )  
+#         else:  
+#             self.conv = nn.Sequential(  
+#                 # pw  
+#                 nn.Conv2d(c1, hidden_dim, 1, 1, 0, bias=False),  
+#                 nn.BatchNorm2d(hidden_dim),  
+#                 nn.ReLU6(inplace=True),  
+#                 # dw  
+#                 nn.Conv2d(hidden_dim, hidden_dim, 3, s, 1, groups=hidden_dim, bias=False),  
+#                 nn.BatchNorm2d(hidden_dim),  
+#                 nn.ReLU6(inplace=True),  
+#                 # pw-linear  
+#                 nn.Conv2d(hidden_dim, c2, 1, 1, 0, bias=False),  
+#                 nn.BatchNorm2d(c2),  
+#             )  
+#     def forward(self, x):  
+#         if self.use_res_connect:  
+#             return x + self.conv(x)  
+#         else:  
+#             return self.conv(x)  
         
 
 class PW_Conv(nn.Module):  
@@ -1138,8 +1139,8 @@ class GhostConv(nn.Module):
     def __init__(self, c1, c2, k=1, s=1, g=1, act=True):  # ch_in, ch_out, kernel, stride, groups
         super(GhostConv, self).__init__()
         c_ = c2 // 2  # hidden channels
-        self.cv1 = Conv(c1, c_, k, s, None, g,act)
-        self.cv2 = Conv(c_, c_, 5, 1, None, c_, act)
+        self.cv1 = Conv(c1, c_, k, s, p=None, g=g,act=act)
+        self.cv2 = Conv(c_, c_, 5, 1, p=None, g=c_, act=act)
 
     def forward(self, x):
         y = self.cv1(x)
